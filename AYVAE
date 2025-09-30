@@ -1,4 +1,8 @@
-{
+ayvae-bot/
+│── package.json
+│── server.js
+│── .env.example
+
   "name": "ayvae-bot",
   "version": "1.0.0",
   "main": "server.js",
