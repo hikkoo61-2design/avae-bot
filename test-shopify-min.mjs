@@ -1,33 +1,20 @@
 import 'dotenv/config';
+import Shopify from 'shopify-api-node';
 
-const shop  = process.env.SHOPIFY_STORE_DOMAIN;
-const token = process.env.SHOPIFY_ACCESS_TOKEN;
+const shopify = new Shopify({
+  shopName: process.env.SHOPIFY_STORE_URL.replace('.myshopify.com', ''),
+  accessToken: process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN
+});
 
-if (!shop || !token) {
-  console.error("❌ Ontbrekende .env waarden.");
-  process.exit(1);
-}
-
-const url = `https://${shop}/admin/api/2025-01/products.json?limit=5`;
-
-try {
-  const res  = await fetch(url, {
-    headers: {
-      'X-Shopify-Access-Token': token,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  const body = await res.text();
-
-  if (!res.ok) {
-    console.error("❌ HTTP", res.status, res.statusText);
-    console.error(body);
-    process.exit(1);
+async function run() {
+  try {
+    const products = await shopify.product.list({ limit: 5 });
+    console.log("✅ Verbonden met Shopify!");
+    console.log("Aantal producten gevonden:", products.length);
+    products.forEach(p => console.log("-", p.title));
+  } catch (err) {
+    console.error("❌ Fout bij Shopify API:", err.message);
   }
-
-  const data = JSON.parse(body);
-  console.log("✅ Verbinding gelukt! Aantal producten:", data.products.length);
-} catch (e) {
-  console.error("❌ Fout:", e.message);
 }
+
+run();
